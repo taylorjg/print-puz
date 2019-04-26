@@ -1,0 +1,21 @@
+{
+  "name": "print-puz",
+  "version": "1.0.0",
+  "description": "Given the URL of a .puz file, display a printable crossword puzzle",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server",
+    "eslint": "eslint ."
+  },
+  "author": "Jonathan Taylor",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "chai": "^4.2.0",
+    "eslint": "^5.16.0",
+    "express": "^4.16.4",
+    "mocha": "^6.1.4",
+    "mustache": "^3.0.1",
+    "mustache-express": "^1.2.8"
+  }
+}
