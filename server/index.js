@@ -2,6 +2,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const mustacheExpress = require('mustache-express')
 const path = require('path')
+const puzzleUtils = require('./puzzleUtils')
 
 const PORT = process.env.PORT || 3020
 
@@ -9,9 +10,12 @@ const page1 = (req, res) => {
   res.render('page1')
 }
 
-const page2 = (req, res) => {
+const page2 = async (req, res) => {
   const puzzleUrl = req.body.puzzleUrl
-  res.render('page2', { puzzleUrl })
+  const bytes = await puzzleUtils.readPuzzle(puzzleUrl)
+  const puzzle = puzzleUtils.parsePuzzle(bytes)
+  console.dir(puzzle)
+  res.render('page2', { puzzleUrl, puzzle })
 }
 
 const app = express()

@@ -17,6 +17,7 @@
     "express": "^4.16.4",
     "mocha": "^6.1.4",
     "mustache": "^3.0.1",
-    "mustache-express": "^1.2.8"
+    "mustache-express": "^1.2.8",
+    "ramda": "^0.26.1"
   }
 }
