@@ -33,6 +33,8 @@ const parseGrid = (bytes, gridOffset, width, height) => {
   return R.splitEvery(width, string)
 }
 
+const NUL = 0
+
 const parseStrings = (bytes, stringsOffset, clueCount) => {
   const indices = Array.from(Array(3 + clueCount).keys())
   const seed = {
@@ -40,9 +42,9 @@ const parseStrings = (bytes, stringsOffset, clueCount) => {
     offset: stringsOffset
   }
   const finalAcc = indices.reduce(acc => {
-    const newOffset = bytes.indexOf(0, acc.offset)
+    const newOffset = bytes.indexOf(NUL, acc.offset)
     if (newOffset < 0) {
-      console.dir(`Expected to find a nul but didn't.`)
+      console.dir(`Expected to find a NUL but didn't.`)
       return acc
     }      
     const slice = bytes.slice(acc.offset, newOffset).map(convertEnDashToHyphenMinus)
