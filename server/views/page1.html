@@ -2,10 +2,27 @@
 
 <head>
     <title>Page 1</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="styles.css" />
 </head>
 
 <body>
-    <p>Page 1</p>
+    <div class="container">
+        <div class="row">
+            <form class="form-inline" method="POST" action="page2.html">
+                <div class="form-group">
+                    <label for="puzzleUrl">Puzzle URL</label>
+                    <input name="puzzleUrl" id="puzzleUrl" type="text" class="form-control input-sm" size="80" required
+                        autofocus />
+                </div>
+                <button id="submit" type="submit" class="btn btn-primary btn-xs">
+                    Submit
+                </button>
+            </form>
+        </div>
+    </div>
 </body>
 
 </html>
