@@ -14,7 +14,7 @@ const page2 = async (req, res) => {
   const puzzleUrl = req.body.puzzleUrl
   const bytes = await puzzleUtils.readPuzzle(puzzleUrl)
   const puzzle = puzzleUtils.parsePuzzle(bytes)
-  console.dir(puzzle)
+  console.log(`puzzle:\n${JSON.stringify(puzzle, null, 2)}`)
   res.render('page2', { puzzleUrl, puzzle })
 }
 

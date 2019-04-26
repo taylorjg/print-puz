@@ -45,8 +45,8 @@ const parseStrings = (bytes, stringsOffset, clueCount) => {
       console.dir(`Expected to find a nul but didn't.`)
       return acc
     }      
-    const slice = bytes.slice(acc.offset, newOffset)
-    const string = Buffer.from(slice).toString('utf8')
+    const slice = bytes.slice(acc.offset, newOffset).map(convertEnDashToHyphenMinus)
+    const string = Buffer.from(slice).toString()
     return {
       strings: [...acc.strings, string],
       offset: newOffset + 1
@@ -54,6 +54,15 @@ const parseStrings = (bytes, stringsOffset, clueCount) => {
   }, seed)
   return finalAcc.strings
 }
+
+const EN_DASH = 0x96
+const HYPHEN_MINUS = 0x2d
+
+// I'm not sure what encoding the .puz file is in (Windows-1250 ?)
+// but there are several occurrences of 0x96 which I think is meant
+// to be EN DASH. However, they seem to come out funny so I am
+// converting them to ASCII 0x2d.
+const convertEnDashToHyphenMinus = ch => ch === EN_DASH ? HYPHEN_MINUS : ch
 
 module.exports = {
   readPuzzle,
