@@ -120,53 +120,31 @@ const calculateSquareDetails = rows => {
 }
 
 const partitionClues = (clues, squares) => {
-  const numberedSquares = R.unnest(squares
-    .map(row => row
-      .filter(col => !!col.number)
-      .map(col => R.pick(['number', 'acrossClue', 'downClue'], col))))
+  const numberedSquares = R.unnest(
+    squares.map(row => row.filter(col => col.number))
+  )
   const seed = {
     clueIndex: 0,
     acrossClues: [],
     downClues: []
   }
   return numberedSquares.reduce((acc, numberedSquare) => {
-    if (numberedSquare.acrossClue && numberedSquare.downClue) {
-      const acrossClue = {
+    const acrossClues = numberedSquare.acrossClue
+      ? [{
         number: numberedSquare.number,
         clue: clues[acc.clueIndex]
-      }
-      const downClue = {
+      }]
+      : []
+    const downClues = numberedSquare.downClue
+      ? [{
         number: numberedSquare.number,
         clue: clues[acc.clueIndex + 1]
-      }
-      return {
-        ...acc,
-        clueIndex: acc.clueIndex + 2,
-        acrossClues: [...acc.acrossClues, acrossClue],
-        downClues: [...acc.downClues, downClue]
-      }
-    }
-    if (numberedSquare.acrossClue) {
-      const acrossClue = {
-        number: numberedSquare.number,
-        clue: clues[acc.clueIndex]
-      }
-      return {
-        ...acc,
-        clueIndex: acc.clueIndex + 1,
-        acrossClues: [...acc.acrossClues, acrossClue]
-      }
-    }
-    if (numberedSquare.downClue) {
-      const downClue = {
-        number: numberedSquare.number,
-        clue: clues[acc.clueIndex]
-      }
-      return {
-        ...acc,
-        clueIndex: acc.clueIndex + 1,
-        downClues: [...acc.downClues, downClue]
-      }
+      }]
+      : []
+    return {
+      clueIndex: acc.clueIndex + acrossClues.length + downClues.length,
+      acrossClues: [...acc.acrossClues, ...acrossClues],
+      downClues: [...acc.downClues, ...downClues]
     }
   }, seed)
 }
