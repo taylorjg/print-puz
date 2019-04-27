@@ -14,12 +14,11 @@ const parsePuzzle = bytes => {
   const gridOffset = 0x34
   const gridSize = width * height
   const grid = parseGrid(bytes, gridOffset, width, height)
+  const squares = calculateSquareDetails(grid)
   const stringsOffset = gridOffset + gridSize + gridSize
   const strings = parseStrings(bytes, stringsOffset, clueCount)
   return {
-    width,
-    height,
-    grid,
+    squares,
     title: strings[0],
     author: strings[1],
     copyright: strings[2],
@@ -46,7 +45,7 @@ const parseStrings = (bytes, stringsOffset, clueCount) => {
     if (newOffset < 0) {
       console.dir(`Expected to find a NUL but didn't.`)
       return acc
-    }      
+    }
     const slice = bytes.slice(acc.offset, newOffset).map(convertEnDashToHyphenMinus)
     const string = Buffer.from(slice).toString()
     return {
@@ -65,6 +64,50 @@ const HYPHEN_MINUS = 0x2d
 // to be EN DASH. However, they seem to come out funny so I am
 // converting them to ASCII 0x2d.
 const convertEnDashToHyphenMinus = ch => ch === EN_DASH ? HYPHEN_MINUS : ch
+
+const calculateSquareDetails = rows => {
+
+  const DOT = '.'
+  const BLACK_SQUARE = 'B'
+  const WHITE_SQUARE = 'W'
+  const LAST_ROW_INDEX = rows.length - 1
+  const LAST_COL_INDEX = rows[0].length - 1
+
+  const isBlackSquare = (rowIndex, colIndex) =>
+    rowIndex < 0 || rowIndex > LAST_ROW_INDEX ||
+    colIndex < 0 || colIndex > LAST_COL_INDEX ||
+    rows[rowIndex][colIndex] === DOT
+
+  let currentClueNumber = 1
+
+  return rows.map((row, rowIndex) => {
+    const cols = row.split('')
+    return cols.map((col, colIndex) => {
+      const leftIsBlackSquare = isBlackSquare(rowIndex, colIndex - 1)
+      const rightIsBlackSquare = isBlackSquare(rowIndex, colIndex + 1)
+      const aboveIsBlackSquare = isBlackSquare(rowIndex - 1, colIndex)
+      const belowIsBlackSquare = isBlackSquare(rowIndex + 1, colIndex)
+      const type = col === DOT ? BLACK_SQUARE : WHITE_SQUARE
+      const acrossClue = leftIsBlackSquare && !rightIsBlackSquare ? true : undefined
+      const downClue = aboveIsBlackSquare && !belowIsBlackSquare ? true : undefined
+      const number = type == WHITE_SQUARE && (acrossClue || downClue) ?
+        currentClueNumber++
+        : undefined
+      const imageSrc = () => {
+        if (type === BLACK_SQUARE) return 'black_cell.gif'
+        if (number) return `${number}_number.gif`
+        return 'white_cell.gif'
+      }
+      return {
+        type,
+        number,
+        acrossClue,
+        downClue,
+        imageSrc
+      }
+    })
+  })
+}
 
 module.exports = {
   readPuzzle,

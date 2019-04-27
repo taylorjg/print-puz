@@ -15,6 +15,10 @@ const page2 = async (req, res) => {
   const bytes = await puzzleUtils.readPuzzle(puzzleUrl)
   const puzzle = puzzleUtils.parsePuzzle(bytes)
   console.log(`puzzle:\n${JSON.stringify(puzzle, null, 2)}`)
+  puzzle.acrossClues = puzzle.clues.slice(0, puzzle.clues.length / 2)
+  puzzle.downClues = puzzle.clues.slice(puzzle.clues.length / 2)
+  puzzle.acrossClues = puzzle.acrossClues.map((clue, index) => ({ clue, number: index + 1}))
+  puzzle.downClues = puzzle.downClues.map((clue, index) => ({ clue, number: index + 1}))
   res.render('page2', { puzzleUrl, puzzle })
 }
 
