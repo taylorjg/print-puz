@@ -1,7 +1,7 @@
 const axios = require('axios')
 const R = require('ramda')
 
-const readPuzzle = async puzzleUrl => {
+const readPuzzleUrl = async puzzleUrl => {
   const config = { responseType: 'arraybuffer' }
   const response = await axios.get(puzzleUrl, config)
   return response.data
@@ -110,6 +110,6 @@ const calculateSquareDetails = rows => {
 }
 
 module.exports = {
-  readPuzzle,
+  readPuzzleUrl,
   parsePuzzle
 }
