@@ -1,3 +1,6 @@
+> This document is a cut-down version of [this wiki document](https://code.google.com/archive/p/puz/wikis/FileFormat.wiki). I have converted it to markdown. I couldn't be bothered converting the whole document
+so I removed everything from `Clue Assignment` onwards.
+
 # Introduction
 
 PUZ is a file format commonly used by commercial software for crossword puzzles. There is, to our knowledge, no documentation of the format available online. This page (and the implementations) is the result of a bit of reverse engineering work.

@@ -5,7 +5,8 @@
   "main": "server/index.js",
   "scripts": {
     "start": "node server",
-    "eslint": "eslint ."
+    "eslint": "eslint .",
+    "test": "mocha test"
   },
   "author": "Jonathan Taylor",
   "license": "MIT",

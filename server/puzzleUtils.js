@@ -1,5 +1,8 @@
 const axios = require('axios')
 const R = require('ramda')
+const fs = require('fs').promises
+
+const readPuzzleFile = fileName => fs.readFile(fileName)
 
 const readPuzzleUrl = async puzzleUrl => {
   const config = { responseType: 'arraybuffer' }
@@ -18,12 +21,18 @@ const parsePuzzle = bytes => {
   const squares = calculateSquareDetails(grid)
   const stringsOffset = gridOffset + gridSize + gridSize
   const strings = parseStrings(bytes, stringsOffset, clueCount)
+  const title = strings[0]
+  const author = strings[1]
+  const copyright = strings[2]
+  const clues = strings.slice(3)
+  const { acrossClues, downClues } = partitionClues(clues, squares)
   return {
     squares,
-    title: strings[0],
-    author: strings[1],
-    copyright: strings[2],
-    clues: strings.slice(3)
+    title,
+    author,
+    copyright,
+    acrossClues,
+    downClues
   }
 }
 
@@ -89,28 +98,81 @@ const calculateSquareDetails = rows => {
       const aboveIsBlackSquare = isBlackSquare(rowIndex - 1, colIndex)
       const belowIsBlackSquare = isBlackSquare(rowIndex + 1, colIndex)
       const type = col === DOT ? BLACK_SQUARE : WHITE_SQUARE
-      const acrossClue = leftIsBlackSquare && !rightIsBlackSquare ? true : undefined
-      const downClue = aboveIsBlackSquare && !belowIsBlackSquare ? true : undefined
-      const number = type == WHITE_SQUARE && (acrossClue || downClue) ?
-        currentClueNumber++
+      const maybeAcrossClue = leftIsBlackSquare && !rightIsBlackSquare ? { acrossClue: true } : undefined
+      const maybeDownClue = aboveIsBlackSquare && !belowIsBlackSquare ? { downClue: true } : undefined
+      const maybeNumber = type == WHITE_SQUARE && (maybeAcrossClue || maybeDownClue)
+        ? { number: currentClueNumber++ }
         : undefined
       const imageSrc = () => {
         if (type === BLACK_SQUARE) return 'black_cell.gif'
-        if (number) return `${number}_number.gif`
+        if (maybeNumber) return `${maybeNumber.number}_number.gif`
         return 'white_cell.gif'
       }
       return {
         type,
-        number,
-        acrossClue,
-        downClue,
+        ...maybeNumber,
+        ...maybeAcrossClue,
+        ...maybeDownClue,
         imageSrc
       }
     })
   })
 }
 
+const partitionClues = (clues, squares) => {
+  const numberedSquares = R.unnest(squares
+    .map(row => row
+      .filter(col => !!col.number)
+      .map(col => R.pick(['number', 'acrossClue', 'downClue'], col))))
+  const seed = {
+    clueIndex: 0,
+    acrossClues: [],
+    downClues: []
+  }
+  return numberedSquares.reduce((acc, numberedSquare) => {
+    if (numberedSquare.acrossClue && numberedSquare.downClue) {
+      const acrossClue = {
+        number: numberedSquare.number,
+        clue: clues[acc.clueIndex]
+      }
+      const downClue = {
+        number: numberedSquare.number,
+        clue: clues[acc.clueIndex + 1]
+      }
+      return {
+        ...acc,
+        clueIndex: acc.clueIndex + 2,
+        acrossClues: [...acc.acrossClues, acrossClue],
+        downClues: [...acc.downClues, downClue]
+      }
+    }
+    if (numberedSquare.acrossClue) {
+      const acrossClue = {
+        number: numberedSquare.number,
+        clue: clues[acc.clueIndex]
+      }
+      return {
+        ...acc,
+        clueIndex: acc.clueIndex + 1,
+        acrossClues: [...acc.acrossClues, acrossClue]
+      }
+    }
+    if (numberedSquare.downClue) {
+      const downClue = {
+        number: numberedSquare.number,
+        clue: clues[acc.clueIndex]
+      }
+      return {
+        ...acc,
+        clueIndex: acc.clueIndex + 1,
+        downClues: [...acc.downClues, downClue]
+      }
+    }
+  }, seed)
+}
+
 module.exports = {
+  readPuzzleFile,
   readPuzzleUrl,
   parsePuzzle
 }
