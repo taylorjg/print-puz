@@ -8,9 +8,10 @@ const readPuzzleUrl = async puzzleUrl => {
 }
 
 const parsePuzzle = bytes => {
-  const width = Number(bytes[0x2c])
-  const height = Number(bytes[0x2d])
-  const clueCount = Number(bytes[0x2e])
+  const buffer = Buffer.from(bytes)
+  const width = buffer.readUInt8(0x2c)
+  const height = buffer.readUInt8(0x2d)
+  const clueCount = buffer.readUInt16LE(0x2e)
   const gridOffset = 0x34
   const gridSize = width * height
   const grid = parseGrid(bytes, gridOffset, width, height)
