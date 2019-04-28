@@ -144,7 +144,7 @@ const partitionClues = (clues, squares) => {
     const downClues = numberedSquare.downClue
       ? [{
         number: numberedSquare.number,
-        clue: clues[acc.clueIndex + 1]
+        clue: clues[acc.clueIndex + acrossClues.length]
       }]
       : []
     return {
