@@ -45,7 +45,7 @@ const parseGrid = (bytes, gridOffset, width, height) => {
 const NUL = 0
 
 const parseStrings = (bytes, stringsOffset, clueCount) => {
-  const indices = Array.from(Array(3 + clueCount).keys())
+  const indices = R.range(0, 3 + clueCount)
   const seed = {
     strings: [],
     offset: stringsOffset
