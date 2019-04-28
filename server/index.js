@@ -2,31 +2,52 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const mustacheExpress = require('mustache-express')
 const path = require('path')
+const axios = require('axios')
 const puzzleUtils = require('./puzzleUtils')
 
 const PORT = process.env.PORT || 3020
 const staticFolder = path.join(__dirname, 'static')
 
-const renderForm = (res, error, puzzleUrl) => {
-  res.render('form', { error, puzzleUrl })
+const renderForm = (res, source, puzzleUrl, error) => {
+  console.log(`[renderForm] source: ${source}; puzzleUrl: ${puzzleUrl}; error: ${error}`)
+  res.render('form', {
+    source,
+    scrapeChecked: source === 'scrape',
+    explicitChecked: source === 'explicit',
+    puzzleUrl,
+    error
+  })
 }
 
 const getRoot = (_, res) => {
-  console.log(`[GET /] rendering form`)
-  renderForm(res)
+  console.log(`[getRoot] rendering form`)
+  renderForm(res, 'scrape')
 }
 
 const postRoot = async (req, res) => {
-  const puzzleUrl = req.body.puzzleUrl
-  console.log(`[POST /] rendering crossword - puzzleUrl: ${puzzleUrl}`)
+  console.log(`[postRoot] source: ${req.body.source}; puzzleUrl: ${req.body.puzzleUrl}`)
   try {
+    const source = req.body.source
+    const puzzleUrl = source === 'scrape'
+      ? await scrapePuzzleUrl()
+      : req.body.puzzleUrl
     const bytes = await puzzleUtils.readPuzzleUrl(puzzleUrl)
     const puzzle = puzzleUtils.parsePuzzle(bytes)
     res.render('crossword', { puzzleUrl, puzzle })
   } catch (error) {
-    console.log(`[POST /] ERROR: ${error.message}`)
-    renderForm(res, error, puzzleUrl)
+    console.log(`[postRoot] ERROR: ${error.message}`)
+    renderForm(res, req.body.source, req.body.puzzleUrl, error)
   }
+}
+
+const scrapePuzzleUrl = async () => {
+  const response = await axios.get('http://www.private-eye.co.uk/crossword')
+  const data = response.data
+  const regex = /crossword is available for <a href="(pictures\/crossword\/download\/[\d]+\.puz)"/
+  const match = regex.exec(data)
+  return match
+    ? `http://www.private-eye.co.uk/${match[1]}`
+    : null
 }
 
 const app = express()
