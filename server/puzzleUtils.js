@@ -93,6 +93,12 @@ const calculateSquareDetails = rows => {
   return rows.map((row, rowIndex) => {
     const cols = row.split('')
     return cols.map((col, colIndex) => {
+      const suffix = () => {
+        if (rowIndex === LAST_ROW_INDEX && colIndex === LAST_COL_INDEX) return 4
+        if (colIndex === LAST_COL_INDEX) return 3
+        if (rowIndex === LAST_ROW_INDEX) return 2
+        return ''
+      }
       const leftIsBlackSquare = isBlackSquare(rowIndex, colIndex - 1)
       const rightIsBlackSquare = isBlackSquare(rowIndex, colIndex + 1)
       const aboveIsBlackSquare = isBlackSquare(rowIndex - 1, colIndex)
@@ -105,8 +111,8 @@ const calculateSquareDetails = rows => {
         : undefined
       const imageSrc = () => {
         if (type === BLACK_SQUARE) return 'black_cell.gif'
-        if (maybeNumber) return `${maybeNumber.number}_number.gif`
-        return 'white_cell.gif'
+        if (maybeNumber) return `${maybeNumber.number}_number${suffix()}.gif`
+        return `white_cell${suffix()}.gif`
       }
       return {
         type,
