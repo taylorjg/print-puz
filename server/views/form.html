@@ -10,12 +10,19 @@
 
 <body>
     <div class="container">
+        {{#error.message}}        
+        <div class="row">
+            <div class="alert alert-danger">
+                {{error.message}}
+            </div>
+        </div>
+        {{/error.message}}        
         <div class="row">
             <form class="form-inline" method="POST">
                 <div class="form-group">
                     <label for="puzzleUrl">Puzzle URL</label>
                     <input name="puzzleUrl" id="puzzleUrl" type="text" class="form-control input-sm" size="80" required
-                        autofocus value="http://www.private-eye.co.uk/pictures/crossword/download/649.puz" />
+                        autofocus value="{{puzzleUrl}}" />
                 </div>
                 <button id="submit" type="submit" class="btn btn-primary btn-xs">
                     Submit

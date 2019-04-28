@@ -7,8 +7,8 @@ const puzzleUtils = require('./puzzleUtils')
 const PORT = process.env.PORT || 3020
 const staticFolder = path.join(__dirname, 'static')
 
-const renderForm = (res, error) => {
-  res.render('form', { error })
+const renderForm = (res, error, puzzleUrl) => {
+  res.render('form', { error, puzzleUrl })
 }
 
 const getRoot = (_, res) => {
@@ -17,15 +17,15 @@ const getRoot = (_, res) => {
 }
 
 const postRoot = async (req, res) => {
+  const puzzleUrl = req.body.puzzleUrl
+  console.log(`[POST /] rendering crossword - puzzleUrl: ${puzzleUrl}`)
   try {
-    const puzzleUrl = req.body.puzzleUrl
-    console.log(`[POST /] rendering crossword - puzzleUrl: ${puzzleUrl}`)
     const bytes = await puzzleUtils.readPuzzleUrl(puzzleUrl)
     const puzzle = puzzleUtils.parsePuzzle(bytes)
     res.render('crossword', { puzzleUrl, puzzle })
   } catch (error) {
     console.log(`[POST /] ERROR: ${error.message}`)
-    renderForm(res, error)
+    renderForm(res, error, puzzleUrl)
   }
 }
 
