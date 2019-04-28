@@ -43,7 +43,7 @@ const postRoot = async (req, res) => {
 const scrapePuzzleUrl = async () => {
   const response = await axios.get('http://www.private-eye.co.uk/crossword')
   const data = response.data
-  const regex = /crossword is available for <a href="(pictures\/crossword\/download\/[\d]+\.puz)"/
+  const regex = /<a href="(pictures\/crossword\/download\/[\d]+\.puz)"/
   const match = regex.exec(data)
   return match
     ? `http://www.private-eye.co.uk/${match[1]}`
